@@ -1,5 +1,84 @@
+
+# Build outputs
+
 bin/
 obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/
+out/
+publish/
+
+# .NET build results
+
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+
+# Visual Studio / IDE
+
+.vs/
+.vscode/
+.idea/
+
+# User-specific files
+
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+
+.idea/
+
+# NuGet
+
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+
+# Logs
+
+*.log
+
+# OS files
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Dotnet tools / caches
+
+
+.dotnet/
+*.dotnet
+
+
+# Publish / deployment
+
+
+*.publishsettings
+
+# Azure / cloud
+
+
+*.azurePubxml
+*.pubxml
+*.pubxml.user
+
+
+# Resharper / Rider caches
+
+
+_ReSharper*/
+*.DotSettings.user
+
+# Misc
+
+
+*.tmp
+*.temp
+*.bak
+*.swp
