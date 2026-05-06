@@ -1,0 +1,23 @@
+﻿@page
+@model UrlShortener.API.Pages.AboutModel
+@{
+    ViewData["Title"] = "About URL Shortener";
+}
+
+<h1>About Our Algorithm</h1>
+
+<div>
+    <p>@Model.AlgorithmDescription</p>
+</div>
+
+@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+{
+    <hr />
+    <h3>Edit Description (Admin Only)</h3>
+    <form method="post">
+        <div class="form-group">
+            <textarea asp-for="NewDescription" class="form-control" rows="5"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Save Changes</button>
+    </form>
+}

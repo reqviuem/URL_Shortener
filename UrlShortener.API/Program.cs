@@ -35,6 +35,7 @@ builder.Services.AddAuthentication(options =>
         };
     });
 builder.Services.AddControllers();
+builder.Services.AddRazorPages();
 builder.Services.AddScoped<UrlShortenerService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -54,6 +55,7 @@ app.UseMiddleware<LoggingMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
 {
