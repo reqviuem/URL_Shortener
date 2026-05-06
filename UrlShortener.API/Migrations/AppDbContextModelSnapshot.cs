@@ -168,7 +168,7 @@ namespace UrlShortener.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Abouts");
+                    b.ToTable("About");
                 });
 
             modelBuilder.Entity("UrlShortener.API.Models.ApplicationUser", b =>
@@ -262,6 +262,9 @@ namespace UrlShortener.API.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ShortenedUrl")
+                        .IsUnique();
 
                     b.ToTable("ShortUrls");
                 });
