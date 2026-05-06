@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +7,7 @@ using UrlShortener.API.Models;
 
 namespace UrlShortener.API.Pages
 {
+    [IgnoreAntiforgeryToken] 
     public class AboutModel : PageModel
     {
         private readonly AppDbContext _context;
@@ -28,31 +29,30 @@ namespace UrlShortener.API.Pages
                                    "URL shortener takes a long URL, generates a unique 6-character string, and stores it in the database";
             NewDescription = AlgorithmDescription;
         }
-
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> OnPostAsync()
+        
+        public async Task<IActionResult> OnPostAsync(string NewDescription)
         {
-            if (!ModelState.IsValid)
+            if (!User.Identity.IsAuthenticated || !(User.IsInRole("Admin") || User.HasClaim(c => c.Type == "isAdmin" && c.Value.ToLower() == "true")))
             {
-                return Page();
+                return Forbid();
             }
 
             var aboutData = await _context.AboutInfo.FirstOrDefaultAsync();
 
             if (aboutData == null)
             {
-                aboutData = new About { Description = NewDescription };
+                aboutData = new About { Description = NewDescription ?? "Default Description" };
                 _context.AboutInfo.Add(aboutData);
             }
             else
             {
-                aboutData.Description = NewDescription;
+                aboutData.Description = NewDescription ?? "Default Description";
                 _context.AboutInfo.Update(aboutData);
             }
 
             await _context.SaveChangesAsync();
-
-            return RedirectToPage();
+            
+            return RedirectToPage(new { access_token = Request.Query["access_token"] });
         }
     }
 }

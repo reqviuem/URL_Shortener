@@ -11,4 +11,5 @@ import { NavbarComponent } from './components/navbar/navbar';
 })
 export class AppComponent {
   title = 'ClientApp';
+
 }
