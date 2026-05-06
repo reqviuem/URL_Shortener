@@ -8,5 +8,5 @@ public class ShortUrl
     public string CreatedById { get; set; }
     public DateTime CreatedDate { get; set; }
 
-    public ApplicationUser CreatedBy { get; set; }
+    public string CreatedBy { get; set; }
 }
