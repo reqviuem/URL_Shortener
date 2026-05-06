@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UrlShortener.API.Data;
 using UrlShortener.API.Models;
+using UrlShortener.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ builder.Services.AddAuthentication(options =>
         };
     });
 builder.Services.AddControllers();
+builder.Services.AddScoped<UrlShortenerService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
