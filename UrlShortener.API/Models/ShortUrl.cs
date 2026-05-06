@@ -3,10 +3,8 @@
 public class ShortUrl
 {
     public int Id { get; set; }
-    public string OriginalUrl { get; set; }
-    public string ShortCode { get; set; }
-    public string CreatedById { get; set; }
-    public DateTime CreatedDate { get; set; }
-
-    public string CreatedBy { get; set; }
+    public string OriginalUrl { get; set; } = string.Empty;
+    public string ShortenedUrl { get; set; } = string.Empty;
+    public string CreatedBy { get; set; } = string.Empty; 
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 }

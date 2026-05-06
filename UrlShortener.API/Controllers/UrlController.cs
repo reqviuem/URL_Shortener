@@ -30,7 +30,7 @@ public class UrlController : ControllerBase
         return Ok(urls);
     }
     
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [Authorize]
     public async Task<IActionResult> GetById(int id)
     {
@@ -55,7 +55,7 @@ public class UrlController : ControllerBase
         var newUrl = new ShortUrl
         {
             OriginalUrl = dto.OriginalUrl,
-            ShortCode = _urlService.GenerateShortUrl(),
+            ShortenedUrl = _urlService.GenerateShortUrl(),
             CreatedBy = username,
             CreatedDate = DateTime.UtcNow
         };
@@ -64,6 +64,20 @@ public class UrlController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(newUrl);
+    }
+    
+    [HttpGet("{shortUrl}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RedirectToOriginal(string shortUrl)
+    {
+        var urlEntity = await _context.ShortUrls.FirstOrDefaultAsync(u => u.ShortenedUrl == shortUrl);
+        
+        if (urlEntity == null)
+        {
+            return NotFound("Short URL not found.");
+        }
+        
+        return Redirect(urlEntity.OriginalUrl);
     }
     
     [HttpDelete("{id}")]

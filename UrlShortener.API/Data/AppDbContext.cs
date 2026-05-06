@@ -12,5 +12,6 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     }
     
     public DbSet<ShortUrl> ShortUrls { get; set; }
+    public DbSet<About> Abouts { get; set; }
     
 }
