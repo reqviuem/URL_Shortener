@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using UrlShortener.API.Data;
 using UrlShortener.API.DTOs;
 using UrlShortener.API.Models;

@@ -1,1 +1,86 @@
-<p>urls-table works!</p>
+<div class="row">
+  <div class="col-12">
+    <h2 class="mb-4">Shortened URLs</h2>
+
+    <!-- ADD NEW URL SECTION: Only visible to authorized users -->
+    <div class="card mb-4" *ngIf="isLoggedIn">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Add New URL</h5>
+      </div>
+      <div class="card-body">
+
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <form (ngSubmit)="addUrl()" class="d-flex gap-2">
+          <input
+            type="url"
+            class="form-control"
+            placeholder="Enter long URL here (e.g., https://example.com/something-very-long)"
+            [(ngModel)]="newUrl"
+            name="newUrl"
+            required>
+          <button type="submit" class="btn btn-success" [disabled]="!newUrl">Shorten</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- THE TABLE: Visible to everyone -->
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered bg-white shadow-sm">
+        <thead class="table-dark">
+        <tr>
+          <th>Original URL</th>
+          <th>Shortened URL</th>
+          <th>Created By</th>
+          <th class="text-center">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Loop through URLs -->
+        <tr *ngFor="let url of urls">
+
+          <!-- Truncate long URLs so they don't break the table -->
+          <td class="text-truncate" style="max-width: 300px;" title="{{ url.originalUrl }}">
+            <a [href]="url.originalUrl" target="_blank">{{ url.originalUrl }}</a>
+          </td>
+
+          <!-- The Short URL -->
+          <td>
+            <strong>{{ url.shortenedUrl }}</strong>
+          </td>
+
+          <td>{{ url.createdBy }}</td>
+
+          <!-- Actions Column -->
+          <td class="text-center">
+
+            <!-- Info Button: Redirects to /urls/:id -->
+            <a class="btn btn-sm btn-info me-2 text-white" [routerLink]="['/urls', url.id]">
+              Info
+            </a>
+
+            <!-- Delete Button: Only visible if the user has permission -->
+            <button
+              class="btn btn-sm btn-danger"
+              *ngIf="canDelete(url)"
+              (click)="deleteUrl(url.id)">
+              Delete
+            </button>
+
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="urls.length === 0">
+          <td colspan="4" class="text-center text-muted py-4">
+            No URLs found. Log in to add one!
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

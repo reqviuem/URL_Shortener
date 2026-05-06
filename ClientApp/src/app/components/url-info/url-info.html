@@ -1,1 +1,52 @@
-<p>url-info works!</p>
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>URL Information</h2>
+      <a class="btn btn-outline-secondary" routerLink="/urls">Back to Table</a>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <div class="card shadow-sm" *ngIf="urlData">
+      <div class="card-body">
+
+        <h5 class="card-title text-muted mb-4">ID: {{ urlData.id }}</h5>
+
+        <table class="table table-borderless">
+          <tbody>
+          <tr>
+            <th scope="row" style="width: 150px;">Original URL:</th>
+            <td class="text-break">
+              <a [href]="urlData.originalUrl" target="_blank">{{ urlData.originalUrl }}</a>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Shortened URL:</th>
+            <td>
+              <strong>{{ urlData.shortenedUrl }}</strong>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Created By:</th>
+            <td>{{ urlData.createdBy }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Created Date:</th>
+            <td>{{ urlData.createdDate | date:'medium' }}</td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+    <div *ngIf="!urlData && !errorMessage" class="text-center mt-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+  </div>
+</div>
