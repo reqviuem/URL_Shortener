@@ -28,5 +28,6 @@ public static class DataSeeder
                 throw new Exception(
                     $"Failed to create Viacheslav: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
+        
     }
 }
