@@ -1,3 +1,4 @@
+import { jwtDecode } from 'jwt-decode';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
@@ -21,10 +22,8 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
       tap((response: any) => {
         localStorage.setItem('jwt_token', response.token);
-        // If your API returns the username/role, save it too
         if (response.username) localStorage.setItem('username', response.username);
 
-        // Update the Navbar instantly
         this.isLoggedInSubject.next(true);
       })
     );
@@ -41,6 +40,24 @@ export class AuthService {
   }
 
   getUsername(): string | null {
-    return localStorage.getItem('username');
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || decoded.unique_name || null;
+    } catch {
+      return null;
+    }
+  }
+
+  isAdmin(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.isAdmin === 'True' || decoded.isAdmin === true || decoded['isAdmin'] === 'True';
+    } catch {
+      return false;
+    }
   }
 }
