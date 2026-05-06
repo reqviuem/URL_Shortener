@@ -8,6 +8,6 @@ export const routes: Routes = [
   { path: '', redirectTo: 'urls', pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'urls', component: UrlsTable },
-  { path: 'urls/:id', component: UrlInfo, canActivate: [authGuard] },
+  { path: 'url/:id', component: UrlInfo, canActivate: [authGuard] },
   { path: '**', redirectTo: 'urls' }
 ];

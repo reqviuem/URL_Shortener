@@ -31,40 +31,27 @@
         <tr>
           <th>Original URL</th>
           <th>Shortened URL</th>
-          <th>Created By</th>
           <th class="text-center">Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor="let url of urls">
-
-          <td class="text-truncate" style="max-width: 300px;" title="{{ url.originalUrl }}">
+          <td class="text-truncate" style="max-width: 300px;">
             <a [href]="url.originalUrl" target="_blank">{{ url.originalUrl }}</a>
           </td>
-
           <td>
-            <strong>{{ url.shortenedUrl }}</strong>
-          </td>
-
-          <td>{{ url.createdBy }}</td>
-
-          <td class="text-center">
-            <a class="btn btn-sm btn-info me-2 text-white" [routerLink]="['/urls', url.id]">
-              Info
+            <a [href]="'http://localhost:5068/api/url/' + url.shortenedUrl" target="_blank" class="fw-bold text-success">
+              {{ url.shortenedUrl }}
             </a>
-
-            <button
-              class="btn btn-sm btn-danger"
-              *ngIf="canDelete(url)"
-              (click)="deleteUrl(url.id)">
-              Delete
-            </button>
-
+          </td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-info me-2" [routerLink]="['/url', url.id]">Info</button>
+            <button class="btn btn-sm btn-outline-danger" *ngIf="canDelete(url)" (click)="deleteUrl(url.id)">Delete</button>
           </td>
         </tr>
 
         <tr *ngIf="urls.length === 0">
-          <td colspan="4" class="text-center text-muted py-4">
+          <td colspan="3" class="text-center text-muted py-4">
             No URLs found.
             <span *ngIf="!isLoggedIn">Log in to add one!</span>
             <span *ngIf="isLoggedIn">Be the first to add one above!</span>

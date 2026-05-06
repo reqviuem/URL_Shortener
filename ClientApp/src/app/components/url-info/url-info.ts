@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService, ShortUrl } from '../../services/api';
@@ -13,10 +13,13 @@ import { ApiService, ShortUrl } from '../../services/api';
 export class UrlInfo implements OnInit {
   urlData: ShortUrl | null = null;
   errorMessage: string = '';
+  loading: boolean = false;
+  error: string = '';
 
   constructor(
     private route: ActivatedRoute,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -28,9 +31,21 @@ export class UrlInfo implements OnInit {
   }
 
   fetchUrlInfo(id: number) {
+    this.loading = true;
+    this.cdr.detectChanges();
+
     this.apiService.getUrlById(id).subscribe({
-      next: (data: ShortUrl) => this.urlData = data,
-      error: (err: any) => this.errorMessage = 'Failed to load URL information.'
+      next: (data) => {
+        this.urlData = data;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error fetching URL details:', err);
+        this.error = 'Failed to load URL details. Please try again.';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 }
