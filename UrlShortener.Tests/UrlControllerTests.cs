@@ -26,12 +26,10 @@ namespace UrlShortener.Tests.Unit
         public async Task RedirectToOriginal_ShouldReturnNotFound_WhenUrlDoesNotExist()
         {
             var context = await GetInMemoryDbContext();
-
             var service = new UrlShortenerService(context);
-
             var controller = new UrlController(service);
 
-            var result = await controller.RedirectToOriginal("invalid");
+            var result = await controller.RedirectToOriginal("invalid", CancellationToken.None);
 
             result.Should().BeOfType<NotFoundObjectResult>();
         }
@@ -51,10 +49,9 @@ namespace UrlShortener.Tests.Unit
             await context.SaveChangesAsync();
 
             var service = new UrlShortenerService(context);
-
             var controller = new UrlController(service);
 
-            var result = await controller.RedirectToOriginal("a1b2c3");
+            var result = await controller.RedirectToOriginal("a1b2c3", CancellationToken.None);
 
             var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
             redirectResult.Url.Should().Be("https://google.com");

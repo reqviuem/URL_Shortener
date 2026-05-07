@@ -13,22 +13,22 @@ public class UrlShortenerService : IUrlShortenerService
         _context = context;
     }
 
-    public async Task<IEnumerable<ShortUrl>> GetAllUrlsAsync()
+    public async Task<IEnumerable<ShortUrl>> GetAllUrlsAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.ShortUrls.ToListAsync();
+        return await _context.ShortUrls.ToListAsync(cancellationToken);
     }
 
-    public async Task<ShortUrl?> GetUrlByIdAsync(int id)
+    public async Task<ShortUrl?> GetUrlByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _context.ShortUrls.FindAsync(id);
+        return await _context.ShortUrls.FindAsync(new object[] { id }, cancellationToken);
     }
 
-    public async Task<ShortUrl?> GetByShortUrlAsync(string shortUrl)
+    public async Task<ShortUrl?> GetByShortUrlAsync(string shortUrl, CancellationToken cancellationToken = default)
     {
-        return await _context.ShortUrls.FirstOrDefaultAsync(u => u.ShortenedUrl == shortUrl);
+        return await _context.ShortUrls.FirstOrDefaultAsync(u => u.ShortenedUrl == shortUrl, cancellationToken);
     }
 
-    public async Task<ShortUrl> CreateUrlAsync(string originalUrl, string createdBy)
+    public async Task<ShortUrl> CreateUrlAsync(string originalUrl, string createdBy, CancellationToken cancellationToken = default)
     {
         var shortUrl = new ShortUrl
         {
@@ -39,23 +39,23 @@ public class UrlShortenerService : IUrlShortenerService
         };
 
         _context.ShortUrls.Add(shortUrl);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return shortUrl;
     }
 
-    public async Task<bool> DeleteUrlAsync(int id, string currentUsername, bool isAdmin)
+    public async Task<bool> DeleteUrlAsync(int id, string currentUsername, bool isAdmin, CancellationToken cancellationToken = default)
     {
-        var urlEntity = await _context.ShortUrls.FindAsync(id);
+        var urlEntity = await _context.ShortUrls.FindAsync(new object[] { id }, cancellationToken);
         if (urlEntity == null) return false;
-        
+
         if (!isAdmin && urlEntity.CreatedBy != currentUsername)
         {
             throw new UnauthorizedAccessException("You don't have permission to delete this URL.");
         }
 
         _context.ShortUrls.Remove(urlEntity);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
         return true;
     }
 
