@@ -40,13 +40,23 @@
             <a [href]="url.originalUrl" target="_blank">{{ url.originalUrl }}</a>
           </td>
           <td>
-            <a [href]="'http://localhost:5068/api/url/' + url.shortenedUrl" target="_blank" class="fw-bold text-success">
+            <a [href]="'http://localhost:5068/api/url/' + url.shortenedUrl" target="_blank"
+               class="fw-bold text-success">
               {{ url.shortenedUrl }}
             </a>
           </td>
           <td class="text-end">
-            <button class="btn btn-sm btn-outline-info me-2" [routerLink]="['/url', url.id]">Info</button>
-            <button class="btn btn-sm btn-outline-danger" *ngIf="canDelete(url)" (click)="deleteUrl(url.id)">Delete</button>
+            <button class="btn btn-sm btn-outline-info me-2"
+                    *ngIf="canDelete(url)"
+                    [routerLink]="['/url', url.id]">
+              Info
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger"
+                    *ngIf="canDelete(url)"
+                    (click)="deleteUrl(url.id)">
+              Delete
+            </button>
           </td>
         </tr>
 
