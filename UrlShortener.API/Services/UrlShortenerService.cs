@@ -4,7 +4,7 @@ using UrlShortener.API.Models;
 
 namespace UrlShortener.API.Services;
 
-public class UrlShortenerService
+public class UrlShortenerService : IUrlShortenerService
 {
     private readonly AppDbContext _context;
 
@@ -12,15 +12,55 @@ public class UrlShortenerService
     {
         _context = context;
     }
-    
-    public string GenerateShortUrl()
+
+    public async Task<IEnumerable<ShortUrl>> GetAllUrlsAsync()
     {
-        // Creates a random 6 character string ("aB3x9Y")
-        return Guid.NewGuid().ToString().Substring(0, 6);
+        return await _context.ShortUrls.ToListAsync();
     }
 
-    public async Task<ShortUrl?> GetByOriginalUrlAsync(string originalUrl)
+    public async Task<ShortUrl?> GetUrlByIdAsync(int id)
     {
-        return await _context.ShortUrls.FirstOrDefaultAsync(u => u.OriginalUrl == originalUrl);
+        return await _context.ShortUrls.FindAsync(id);
+    }
+
+    public async Task<ShortUrl?> GetByShortUrlAsync(string shortUrl)
+    {
+        return await _context.ShortUrls.FirstOrDefaultAsync(u => u.ShortenedUrl == shortUrl);
+    }
+
+    public async Task<ShortUrl> CreateUrlAsync(string originalUrl, string createdBy)
+    {
+        var shortUrl = new ShortUrl
+        {
+            OriginalUrl = originalUrl,
+            ShortenedUrl = GenerateShortUrl(),
+            CreatedBy = createdBy,
+            CreatedDate = DateTime.UtcNow
+        };
+
+        _context.ShortUrls.Add(shortUrl);
+        await _context.SaveChangesAsync();
+
+        return shortUrl;
+    }
+
+    public async Task<bool> DeleteUrlAsync(int id, string currentUsername, bool isAdmin)
+    {
+        var urlEntity = await _context.ShortUrls.FindAsync(id);
+        if (urlEntity == null) return false;
+        
+        if (!isAdmin && urlEntity.CreatedBy != currentUsername)
+        {
+            throw new UnauthorizedAccessException("You don't have permission to delete this URL.");
+        }
+
+        _context.ShortUrls.Remove(urlEntity);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    private string GenerateShortUrl()
+    {
+        return Guid.NewGuid().ToString().Substring(0, 6);
     }
 }

@@ -29,7 +29,7 @@ namespace UrlShortener.Tests.Unit
 
             var service = new UrlShortenerService(context);
 
-            var controller = new UrlController(context, service);
+            var controller = new UrlController(service);
 
             var result = await controller.RedirectToOriginal("invalid");
 
@@ -52,7 +52,7 @@ namespace UrlShortener.Tests.Unit
 
             var service = new UrlShortenerService(context);
 
-            var controller = new UrlController(context, service);
+            var controller = new UrlController(service);
 
             var result = await controller.RedirectToOriginal("a1b2c3");
 

@@ -1,111 +1,79 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using UrlShortener.API.Data;
+using System.Security.Claims;
 using UrlShortener.API.DTOs;
-using UrlShortener.API.Models;
 using UrlShortener.API.Services;
 
 namespace UrlShortener.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class UrlController : ControllerBase
 {
-    private readonly AppDbContext _context;
-    private readonly UrlShortenerService _urlService;
-
-    public UrlController(AppDbContext context, UrlShortenerService urlService)
+    private readonly IUrlShortenerService _urlService;
+    
+    public UrlController(IUrlShortenerService urlService)
     {
-        _context = context;
         _urlService = urlService;
     }
 
     [HttpGet]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAllUrls()
     {
-        var urls = await _context.ShortUrls.ToListAsync();
+        var urls = await _urlService.GetAllUrlsAsync();
         return Ok(urls);
     }
 
     [HttpGet("{id:int}")]
-    [Authorize]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetUrl(int id)
     {
-        var url = await _context.ShortUrls.FindAsync(id);
-        if (url == null) return NotFound();
-
-        bool isAdmin = User.IsInRole("Admin") || User.HasClaim(c => c.Type == "isAdmin" && c.Value.ToLower() == "true");
-
-        string currentUsername = User.Identity?.Name ?? "";
-
-        if (!isAdmin && url.CreatedBy != currentUsername)
-        {
-            return Forbid();
-        }
+        var url = await _urlService.GetUrlByIdAsync(id);
+        if (url == null) return NotFound(new { message = "URL not found." });
 
         return Ok(url);
     }
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] CreateUrlDto dto)
+    public async Task<IActionResult> CreateUrl([FromBody] CreateUrlDto dto)
     {
-        var existing = await _urlService.GetByOriginalUrlAsync(dto.OriginalUrl);
-        if (existing != null)
-        {
-            return BadRequest(new { message = "This URL has already been shortened." });
-        }
+        if (string.IsNullOrWhiteSpace(dto.OriginalUrl))
+            return BadRequest(new { message = "URL is required." });
 
-        var username = User.Identity?.Name ?? "Unknown";
-
-        var newUrl = new ShortUrl
-        {
-            OriginalUrl = dto.OriginalUrl,
-            ShortenedUrl = _urlService.GenerateShortUrl(),
-            CreatedBy = username,
-            CreatedDate = DateTime.UtcNow
-        };
-
-        _context.ShortUrls.Add(newUrl);
-        await _context.SaveChangesAsync();
+        var username = User.FindFirstValue(ClaimTypes.Name);
+        var newUrl = await _urlService.CreateUrlAsync(dto.OriginalUrl, username);
 
         return Ok(newUrl);
     }
 
-    [HttpGet("{shortUrl}")]
-    [AllowAnonymous]
-    public async Task<IActionResult> RedirectToOriginal(string shortUrl)
-    {
-        var urlEntity = await _context.ShortUrls.FirstOrDefaultAsync(u => u.ShortenedUrl == shortUrl);
-
-        if (urlEntity == null)
-        {
-            return NotFound("Short URL not found.");
-        }
-
-        return Redirect(urlEntity.OriginalUrl);
-    }
-
     [HttpDelete("{id}")]
     [Authorize]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> DeleteUrl(int id)
     {
-        var url = await _context.ShortUrls.FindAsync(id);
-        if (url == null) return NotFound();
+        var username = User.FindFirstValue(ClaimTypes.Name);
+        var isAdmin = User.IsInRole("Admin");
 
-        var currentUsername = User.Identity?.Name;
-        var isAdmin = User.Claims.FirstOrDefault(c => c.Type == "isAdmin")?.Value == "True";
+        try
+        {
+            var success = await _urlService.DeleteUrlAsync(id, username, isAdmin);
+            if (!success) return NotFound(new { message = "URL not found." });
 
-        if (!isAdmin && url.CreatedBy != currentUsername)
+            return Ok();
+        }
+        catch (UnauthorizedAccessException)
         {
             return Forbid();
         }
+    }
 
-        _context.ShortUrls.Remove(url);
-        await _context.SaveChangesAsync();
+    [HttpGet("{shortUrl}")]
+    public async Task<IActionResult> RedirectToOriginal(string shortUrl)
+    {
+        var urlEntity = await _urlService.GetByShortUrlAsync(shortUrl);
+        
+        if (urlEntity == null)
+            return NotFound("Short URL not found");
 
-        return NoContent();
+        return Redirect(urlEntity.OriginalUrl);
     }
 }
